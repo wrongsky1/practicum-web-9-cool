@@ -1,38 +1,42 @@
-document.getElementById("searchBtn").addEventListener("click", function () {
-  var query1 = document.getElementById("query1").value;
-  var query2 = document.getElementById("query2").value;
+function generateResultCard(result) {
+  const card = document.createElement("div");
+  card.classList.add("result-card");
+  card.innerHTML = `
+        <h3>${result.title}</h3>
+        <p>${result.description}</p>
+        <a href="${result.link}" target="_blank">Подробнее</a>
+    `;
+  return card;
+}
 
-  // Отправляем запрос на сервер
-  fetch("/search", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ query1: query1, query2: query2 }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      // Обработка ответа от сервера и отображение результатов
-      displayResults(data);
-    })
-    .catch((error) => {
-      console.error("Ошибка:", error);
+document
+  .getElementById("searchForm")
+  .addEventListener("submit", handleFormSubmit);
+
+async function handleFormSubmit(event) {
+  event.preventDefault();
+
+  try {
+    const formData = new FormData(event.target);
+
+    const response = await fetch("/search", {
+      method: "POST",
+      body: formData,
     });
-});
 
-function displayResults(data) {
-  var resultsContainer = document.getElementById("results");
-  // Очищаем результаты от предыдущих запросов
-  resultsContainer.innerHTML = "";
+    if (!response.ok) {
+      throw new Error("Ошибка при отправке запроса: " + response.status);
+    }
 
-  // Создаем элементы для отображения результатов
-  var result1 = document.createElement("p");
-  result1.textContent = data.result1;
+    const data = await response.json();
 
-  var result2 = document.createElement("p");
-  result2.textContent = data.result2;
-
-  // Добавляем результаты в контейнер
-  resultsContainer.appendChild(result1);
-  resultsContainer.appendChild(result2);
+    const resultsContainer = document.getElementById("results");
+    resultsContainer.innerHTML = "";
+    data.results.forEach((result) => {
+      const resultCard = generateResultCard(result);
+      resultsContainer.appendChild(resultCard);
+    });
+  } catch (error) {
+    console.error(error);
+  }
 }

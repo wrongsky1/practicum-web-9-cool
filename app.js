@@ -1,15 +1,21 @@
 const express = require("express");
-const searchRoutes = require("./routes/searchRoutes");
+const path = require("path");
+
+const errorHandler = require("./middlewares/errorHandler");
+const mainRoute = require("./routes/main");
+const searchRoute = require("./routes/search");
 
 const app = express();
-const port = 3000;
+const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
+app.use(
+  express.json(),
+  errorHandler,
+  express.static(path.join(__dirname, "public")),
+  mainRoute,
+  searchRoute
+);
 
-app.post("/", (req, res) => {
-	// логика приложения
-});
-
-app.listen(port, () => {
-  console.log(`Сервер запущен тут http://localhost:${port}`);
-});
+app.listen(PORT, () =>
+  console.log(`Сервер запущен на http://localhost:${PORT}`)
+);
