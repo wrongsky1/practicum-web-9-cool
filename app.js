@@ -16,6 +16,6 @@ app.use(
   searchRoute
 );
 
-app.listen(PORT, () =>
-  console.log(`Сервер запущен на http://localhost:${PORT}`)
-);
+// много нового кода
+
+app.listen(PORT, () => console.log(`Сервер запущен на http://localhost:${PORT}`));
